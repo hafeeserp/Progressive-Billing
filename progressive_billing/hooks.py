@@ -76,7 +76,7 @@ doctype_js = {"Sales Invoice" : "public/js/sales_invoice.js"}
 # }
 
 
-fixtures = [{"dt": "Custom Field", "filters":[["name", "in", ['Sales Invoice-progressive_billing','Sales Invoice-sales_order','Sales Invoice-project_progressive','Sales Invoice-get_items_from_task','Sales Invoice-get_items_from_payment_terms','Sales Invoice-column_break_22','Sales Invoice-sales_order_total','Sales Invoice-total_invoiced','Sales Invoice-pending_invoice_amount','Sales Invoice-column23223','Sales Invoice-total_due_now','Sales Invoice-new_invoiced_total','Sales Invoice-total_after_current_invoice','Task-rate']]]}]
+fixtures = [{"dt": "Custom Field", "filters":[["name", "in", ['Sales Invoice-progressive_billing','Sales Invoice-sales_order','Sales Invoice-project_progressive','Sales Invoice-get_items_from_task','Sales Invoice-get_items_from_payment_terms','Sales Invoice-column_break_22','Sales Invoice-sales_order_total','Sales Invoice-total_invoiced','Sales Invoice-pending_invoice_amount','Sales Invoice-column23223','Sales Invoice-total_due_now','Sales Invoice-new_invoiced_total','Sales Invoice-total_after_current_invoice','Task-rate','Sales Invoice Item-progress']]]}]
 
 
 # Document Events
