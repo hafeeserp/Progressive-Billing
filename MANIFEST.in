@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include progressive_billing *.css
+recursive-include progressive_billing *.csv
+recursive-include progressive_billing *.html
+recursive-include progressive_billing *.ico
+recursive-include progressive_billing *.js
+recursive-include progressive_billing *.json
+recursive-include progressive_billing *.md
+recursive-include progressive_billing *.png
+recursive-include progressive_billing *.py
+recursive-include progressive_billing *.svg
+recursive-include progressive_billing *.txt
+recursive-exclude progressive_billing *.pyc
