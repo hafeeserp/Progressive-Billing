@@ -22,6 +22,7 @@ frappe.ui.form.on('Sales Invoice', {
                         }
                 });
 
+		frm.cscript.customer();
                 frappe.call({
                                 method: "progressive_billing.progressive_billing.progressive_billing.get_progressive_invoice_data",
                                 args: {
