@@ -86,7 +86,7 @@ def validate_app(doc,method):
 def validate(self):
 	task_total = 0
 	for task in self.tasks:
-		task_total = task.rate
+		task_total += task.rate
 
 	if task_total > self.total_sales_amount:
 		frappe.throw(_("Task Total Can Not Be Greater Than Sales Order Amount"))
