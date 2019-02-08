@@ -19,7 +19,7 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos, get_delive
 from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 from erpnext import get_company_currency, get_default_company
-
+from erpnext.projects.doctype.project.project import Project
 
 @frappe.whitelist()
 def get_progressive_invoice_data(sales_order='', project='',test=''):
@@ -54,3 +54,39 @@ def get_item_data(sales_order='', project='',test=''):
 
         return tuple(lst_item_data)
 
+"""def onload_custom(doc,method):
+	
+	Project.load_tasks = load_tasks
+
+
+def load_tasks(self):
+	
+	self.tasks = []
+	for task in self.get_tasks():
+		frappe.msgprint(frappe.as_json(task))
+		task_map = {
+			"title": task.subject,
+			"status": task.status,
+			"start_date": task.exp_start_date,
+			"end_date": task.exp_end_date,
+			"description": task.description,
+			"task_id": task.name,
+			"task_weight": task.task_weight,
+			"rate":task.rate,
+			"progress":task.progress
+		}
+
+		self.map_custom_fields(task, task_map)
+		self.append("tasks", task_map)
+"""	
+
+def validate_app(doc,method):
+	Project.validate = validate
+
+def validate(self):
+	task_total = 0
+	for task in self.tasks:
+		task_total = task.rate
+
+	if task_total > self.total_sales_amount:
+		frappe.throw(_("Task Total Can Not Be Greater Than Sales Order Amount"))

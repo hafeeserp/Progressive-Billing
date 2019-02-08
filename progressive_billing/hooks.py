@@ -90,7 +90,11 @@ fixtures = [{"dt": "Custom Field", "filters":[["name", "in", ['Sales Invoice-pro
 # 		"on_trash": "method"
 #	}
 # }
-
+doc_events = {
+	'Project': {
+		'validate': 'progressive_billing.progressive_billing.progressive_billing.validate_app',
+	}
+}
 # Scheduled Tasks
 # ---------------
 
