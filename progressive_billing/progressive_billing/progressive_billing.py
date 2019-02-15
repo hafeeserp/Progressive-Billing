@@ -31,54 +31,78 @@ def get_progressive_invoice_data(sales_order='', project='',test=''):
 
 @frappe.whitelist()
 def get_item_data(sales_order='', project='',test=''):
-        task_data = frappe.db.sql("""select subject,progress,rate from `tabTask` where project=%s""",project)
+        task_data = frappe.db.sql("""select subject,progress,rate,qty,item_amount,uom from `tabTask` where project=%s""",project)
         lst_item_data = []
-
+	
         default_uom = frappe.db.get_single_value('Stock Settings','stock_uom')
         income_account = frappe.db.get_value('Company',get_default_company(),'default_income_account')
         for task in task_data:
                 item_data = {}
-                total_progress = frappe.db.sql("""select sum(progress) from `tabSales Invoice Item` where sales_order=%s and item_name=%s""",(sales_order,task[0]))[0][0]
+		
+		sales_invoices = frappe.db.sql("""select name from `tabSales Invoice` where sales_order=%s and docstatus = 1""",sales_order)
+		invoice_list = []
+		if sales_invoices:
+			for invoice in sales_invoices:
+				invoice_list.append(invoice[0])
+		#frappe.msgprint(frappe.as_json(invoice_list))
+                #total_progress = frappe.db.sql("""select sum(progress) from `tabSales Invoice Item` where parent in (%s) and item_name=%s and sales_order=%s""" %(', '.join(["%s"]*len(invoice_list))), tuple(invoice_list),'%s','%s'),)[0][0]
+		#total_progress = frappe.db.sql("""select sum(progress) from `tabSales Invoice Item` where sales_order=%s and item_name=%s""",(sales_order,task[0]))[0][0]
+		#items = list(set([d for d in invoice_list]))
+		items = invoice_list
+		if items:
+			total_progress = frappe.db.sql("""select sum(progress) from `tabSales Invoice Item` where item_name=%s and sales_order=%s and parent in ({0})""".format(", ".join(["%s"] * len(items))), [task[0]] +[sales_order]+items)[0][0]
+		else:
+			total_progress = 0
                 item_data['subject']=task[0]
                 if total_progress:
                         item_data['current_progress']=task[1]
                         item_data['progress']=task[1]-total_progress
+		
                 else:
                         item_data['current_progress']=0
                         item_data['progress']=task[1]
-
-                item_data['uom'] = default_uom
+		
+                item_data['uom'] = task[5]
                 item_data['income_account'] = income_account
                 item_data['rate'] = task[2]
+		item_data['item_rate'] = task[4]
+		item_data['qty'] = task[3]
+		
+		
                 lst_item_data.append(item_data)
 
         return tuple(lst_item_data)
 
-"""def onload_custom(doc,method):
-	
-	Project.load_tasks = load_tasks
+@frappe.whitelist()
+def make_project(source_name, target_doc=None):
+	def postprocess(source, doc):
+		doc.project_type = "External"
+		doc.project_name = source.name
 
-
-def load_tasks(self):
-	
-	self.tasks = []
-	for task in self.get_tasks():
-		frappe.msgprint(frappe.as_json(task))
-		task_map = {
-			"title": task.subject,
-			"status": task.status,
-			"start_date": task.exp_start_date,
-			"end_date": task.exp_end_date,
-			"description": task.description,
-			"task_id": task.name,
-			"task_weight": task.task_weight,
-			"rate":task.rate,
-			"progress":task.progress
+	doc = get_mapped_doc("Sales Order", source_name, {
+		"Sales Order": {
+			"doctype": "Project",
+			"validation": {
+				"docstatus": ["=", 1]
+			},
+			"field_map":{
+				"name" : "sales_order",
+				"base_grand_total" : "estimated_costing",
+			}
+		},
+		"Sales Order Item": {
+			"doctype": "Project Task",
+			"field_map": {
+				"item_name": "title",
+				"qty":"qty",
+				"amount":"rate",
+				"rate":"item_amount",
+				"uom":"uom"
+			},
 		}
+	}, target_doc, postprocess)
+	return doc
 
-		self.map_custom_fields(task, task_map)
-		self.append("tasks", task_map)
-"""	
 
 def validate_app(doc,method):
 	Project.validate = validate
@@ -86,7 +110,21 @@ def validate_app(doc,method):
 def validate(self):
 	task_total = 0
 	for task in self.tasks:
-		task_total += task.rate
+                task_total += task.rate
+	self.validate_project_name()
+        self.validate_dates()
+        self.validate_weights()
+	total_sales_amount = frappe.db.sql("""select grand_total from `tabSales Order` where name=%s""",self.sales_order)[0]
 
-	if task_total > self.total_sales_amount:
-		frappe.throw(_("Task Total Can Not Be Greater Than Sales Order Amount"))
+        if total_sales_amount:
+                if task_total > total_sales_amount[0]:
+                        frappe.throw(_("Task Total Can Not Be Greater Than Sales Order Amount"))
+
+        self.sync_tasks()
+        self.tasks = []
+        self.send_welcome_email()
+	'''total_sales_amount = frappe.db.sql("""select grand_total from `tabSales Order` where name=%s""",self.sales_order)[0]
+	
+	if total_sales_amount:
+		if task_total > total_sales_amount[0]:
+			frappe.throw(_("Task Total Can Not Be Greater Than Sales Order Amount"))'''

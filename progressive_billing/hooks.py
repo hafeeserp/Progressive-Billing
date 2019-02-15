@@ -26,8 +26,7 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Sales Invoice" : "public/js/sales_invoice.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_js = {"Sales Invoice" : "public/js/sales_invoice.js","Sales Order" : "public/js/sales_order.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -124,7 +123,7 @@ doc_events = {
 # Overriding Whitelisted Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "progressive_billing.event.get_events"
-# }
+#override_whitelisted_methods = {
+#	'erpnext.selling.doctype.sales_order.sales_order.make_project':'progressive_billing.progressive_billing.progressive_billing.make_project'
+#}
 

@@ -63,8 +63,9 @@ frappe.ui.form.on('Sales Invoice', {
                                         var child = frm.add_child("items");
                                         frappe.model.set_value(child.doctype, child.name, "description", r.message[i].subject)
                                         frappe.model.set_value(child.doctype, child.name, "item_name", r.message[i].subject)
-
-                                        //frappe.model.set_value(child.doctype, child.name, "rate", r.message[i].rate)
+					frappe.model.set_value(child.doctype, child.name, "so_rate", r.message[i].item_rate)
+					frappe.model.set_value(child.doctype, child.name, "so_qty", r.message[i].qty)
+                                        frappe.model.set_value(child.doctype, child.name, "so_amount", r.message[i].qty*r.message[i].item_rate)
                                         frappe.model.set_value(child.doctype, child.name, "qty", 1)
                                         frappe.model.set_value(child.doctype, child.name, "uom", r.message[i].uom)
                                         frappe.model.set_value(child.doctype, child.name, "sales_order", frm.doc.sales_order.toString())
@@ -81,6 +82,11 @@ frappe.ui.form.on('Sales Invoice', {
 
 
         },
-
+	validate:function(frm){
+	
+		frm.set_value("new_invoiced_total",frm.doc.grand_total)
+		frm.set_value("total_after_current_invoice",frm.doc.grand_total+frm.doc.total_invoiced)
+	
+	}
 	  
 })
