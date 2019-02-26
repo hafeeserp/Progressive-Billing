@@ -57,7 +57,7 @@ frappe.ui.form.on('Sales Invoice', {
                         callback: function(r) { 
                                 
                                 frm.doc.items=[]
-                                for(i=0;i<r.message.length;i++){
+                                for(var i=0;i<r.message.length;i++){
                                         console.log(r.message[i])
 
                                         var child = frm.add_child("items");
